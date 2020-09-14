@@ -59,7 +59,8 @@ When looking at the plug of the *controller cable* :
 6 : Attention  -> to arduino digital pin 2
 7 : SCK        -> to arduino SCK (on ICSP header)
 
-* Note: 1k ohm pullup resistor to 5V means you also have to put a 1k ohm resistor between 5V and MISO. See the demo pic.
+* Note: 1k ohm pullup resistor to 5V means you also have to put a 1k ohm resistor between 5V and MISO.
+See the demo pic.
 
  ```
 
