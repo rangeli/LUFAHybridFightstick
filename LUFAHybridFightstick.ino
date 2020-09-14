@@ -1,8 +1,7 @@
 #include "LUFAConfig.h"
 #include <LUFA.h>
 #include "XS_HID.h"
-#define BOUNCE_WITH_PROMPT_DETECTION
-#include <Bounce2.h>
+#include "PSXPad.h"
 #include <EEPROM.h>
 #include <inttypes.h>
 
@@ -16,23 +15,6 @@ unsigned long currTime = 0;
 
 byte internalButtonStatus[4];
 
-
-Bounce joystickUP = Bounce();
-Bounce joystickDOWN = Bounce();
-Bounce joystickLEFT = Bounce();
-Bounce joystickRIGHT = Bounce();
-Bounce buttonA = Bounce();
-Bounce buttonB = Bounce();
-Bounce buttonX = Bounce();
-Bounce buttonY = Bounce();
-Bounce buttonLB = Bounce();
-Bounce buttonRB = Bounce();
-Bounce buttonLT = Bounce();
-Bounce buttonRT = Bounce();
-Bounce buttonSTART = Bounce();
-Bounce buttonSELECT = Bounce();
-Bounce buttonHOME = Bounce();
-
 /* MODE DECLARATIONS */
 typedef enum {
   RIGHT_ANALOG_MODE,
@@ -40,6 +22,9 @@ typedef enum {
   DIGITAL,
 } State_t;
 State_t state;
+
+byte lbAttPinNos[] = {2};
+PSXPad_KeyState_t tKeyState;
 
 /* mode selectors */
 bool xinput;
@@ -69,62 +54,29 @@ void checkModeChange(){
     }
 }
 
-void setupPins(){
-    joystickUP.attach(A0,INPUT_PULLUP);
-    joystickDOWN.attach(A2,INPUT_PULLUP);
-    joystickLEFT.attach(A1,INPUT_PULLUP);
-    joystickRIGHT.attach(A3,INPUT_PULLUP);
-    buttonA.attach(5,INPUT_PULLUP);
-    buttonB.attach(4,INPUT_PULLUP);;
-    buttonX.attach(3,INPUT_PULLUP);
-    buttonY.attach(15,INPUT_PULLUP);
-    buttonLB.attach(14,INPUT_PULLUP);
-    buttonRB.attach(2,INPUT_PULLUP);
-    buttonLT.attach(6,INPUT_PULLUP);
-    buttonRT.attach(7,INPUT_PULLUP);
-    buttonSTART.attach(16,INPUT_PULLUP);
-    buttonSELECT.attach(10,INPUT_PULLUP);
-    buttonHOME.attach(9,INPUT_PULLUP);
-
-    joystickUP.interval(MILLIDEBOUNCE);
-    joystickDOWN.interval(MILLIDEBOUNCE);
-    joystickLEFT.interval(MILLIDEBOUNCE);
-    joystickRIGHT.interval(MILLIDEBOUNCE);
-    buttonA.interval(MILLIDEBOUNCE);
-    buttonB.interval(MILLIDEBOUNCE);
-    buttonX.interval(MILLIDEBOUNCE);
-    buttonY.interval(MILLIDEBOUNCE);
-    buttonLB.interval(MILLIDEBOUNCE);
-    buttonRB.interval(MILLIDEBOUNCE);
-    buttonLT.interval(MILLIDEBOUNCE);
-    buttonRT.interval(MILLIDEBOUNCE);
-    buttonSTART.interval(MILLIDEBOUNCE);
-    buttonSELECT.interval(MILLIDEBOUNCE);
-    buttonHOME.interval(MILLIDEBOUNCE);
-}
 void setup() {
-
+  
+  PSXPads.begin(1, lbAttPinNos);
   modeChanged = false;
   EEPROM.get(0, state);
   EEPROM.get(2, xinput);
-  setupPins();
   delay(500);
 // if select is held on boot, NSWitch mode
-  int value = digitalRead(10);
-  if (value == LOW)
+  PSXPads.pool();
+  PSXPads.lpcPads[0]->getKeyState(&tKeyState);
+  
+  if(tKeyState.bSel)
   {
     xinput = false;
     EEPROM.put(2, xinput);
   }
 // if start is held on boot, XInput mode
-  else {
-    value = digitalRead(16);
-    if (value == LOW)
+  else if(tKeyState.bStt)
       {
         xinput = true;
         EEPROM.put(2, xinput);
       }
-  }
+  
   
   SetupHardware(xinput);
   GlobalInterruptEnable();
@@ -197,22 +149,25 @@ void convert_dpad(){
 }
 
 void buttonRead()
-{  
-  if (joystickUP.update()) {internalButtonStatus[BUTTONUP] = joystickUP.fell();}
-  if (joystickDOWN.update()) {internalButtonStatus[BUTTONDOWN] = joystickDOWN.fell();}
-  if (joystickLEFT.update()) {internalButtonStatus[BUTTONLEFT] = joystickLEFT.fell();}
-  if (joystickRIGHT.update()) {internalButtonStatus[BUTTONRIGHT] = joystickRIGHT.fell();}
-  if (buttonA.update()) {buttonStatus[BUTTONA] = buttonA.fell();}
-  if (buttonB.update()) {buttonStatus[BUTTONB] = buttonB.fell();}
-  if (buttonX.update()) {buttonStatus[BUTTONX] = buttonX.fell();}
-  if (buttonY.update()) {buttonStatus[BUTTONY] = buttonY.fell();}
-  if (buttonLB.update()) {buttonStatus[BUTTONLB] = buttonLB.fell();}
-  if (buttonRB.update()) {buttonStatus[BUTTONRB] = buttonRB.fell();}
-  if (buttonLT.update()) {buttonStatus[BUTTONLT] = buttonLT.fell();}
-  if (buttonRT.update()) {buttonStatus[BUTTONRT] = buttonRT.fell();}
-  if (buttonSTART.update()) {buttonStatus[BUTTONSTART] = buttonSTART.fell();}
-  if (buttonSELECT.update()) {buttonStatus[BUTTONSELECT] = buttonSELECT.fell();}
-  if (buttonHOME.update()) { buttonStatus[BUTTONHOME] = buttonHOME.fell();}
+{    
+  PSXPads.pool();
+  PSXPads.lpcPads[0]->getKeyState(&tKeyState);
+  buttonStatus[BUTTONSELECT] = tKeyState.bSel;
+  buttonStatus[BUTTONL3] = tKeyState.bL3;
+  buttonStatus[BUTTONR3] = tKeyState.bR3;
+  buttonStatus[BUTTONSTART] = tKeyState.bStt;
+  internalButtonStatus[BUTTONUP] = tKeyState.bU;
+  internalButtonStatus[BUTTONRIGHT] = tKeyState.bR;
+  internalButtonStatus[BUTTONDOWN] = tKeyState.bD;
+  internalButtonStatus[BUTTONLEFT] = tKeyState.bL;
+  buttonStatus[BUTTONLT] = tKeyState.bL2;
+  buttonStatus[BUTTONRT] = tKeyState.bR2;
+  buttonStatus[BUTTONLB] = tKeyState.bL1;
+  buttonStatus[BUTTONRB] = tKeyState.bR1;
+  buttonStatus[BUTTONX] = tKeyState.bTri;
+  buttonStatus[BUTTONA] = tKeyState.bCir;
+  buttonStatus[BUTTONY] = tKeyState.bSqr;
+  buttonStatus[BUTTONB] = tKeyState.bCrs;
 
 #define HOME_HOTKEY
 #ifdef HOME_HOTKEY  

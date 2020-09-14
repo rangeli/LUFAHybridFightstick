@@ -1,18 +1,20 @@
-## LUFA Switch/XInput hybrid Fightstick
+## LUFA Switch/XInput hybrid Fightstick (PSX Edition)
 
-I really like the "neogeo pad 2" (basically a neogeo cd pad with 6 face buttons + 2 triggers), and wanted to make one of mine work both on nintendo switch and PC so I modded an Arduino pro micro inside it and made some code.
+This code can be used to make a PSX Gamepad work on Nintendo Switch and XBox360 (or PC in XInput mode).
 
-While [it's working great](https://www.instagram.com/p/B56IP1AIHOc/), it'd definitely need a bit more cleanup ^^;
+I've put an arduino pro micro directly inside the controller, but you could also go non-destructive and use this code to make an external usb adapter.
 
-I've also written some variants if you'd rather convert a [SNES pad](https://github.com/CrazyRedMachine/LUFAHybridFightstick/tree/SNES) or a [PC-FX pad](https://github.com/CrazyRedMachine/LUFAHybridFightstick/tree/PCFX).
+## Demo
 
-Expect new PSX code based on dualshock protocol for easier modding soon.
+https://www.instagram.com/p/CFIj8BZFxf4/
 
 ## Acknowledgments
 
 This work is based on [fluffymadness' ATMega32U4-Switch-Fightstick](https://github.com/fluffymadness/ATMega32U4-Switch-Fightstick)
  and [bootsector's XInputPadMicro](https://github.com/bootsector/XInputPadMicro), with a couple QoL improvements I needed.
- 
+
+The PSX pad read code is based on [PSX(PS1/2) pad library by AZO](https://github.com/AZO234/Arduino_PSXPad/).
+
 ## Features
 
 ### Gamepad modes
@@ -25,9 +27,9 @@ Gamepad mode is persistent across plugging and unplugging the controller, so if 
 
 ### DPAD modes
 
-You can switch seamlessly between the 3 stick modes by pressing START+SELECT+(LEFT/UP/RIGHT)
+You can switch seamlessly between the 3 stick modes by pressing START+SELECT+(LEFT/UP/RIGHT).
 
-- UP: DPAD 
+- UP: DPAD
 - LEFT: Fake Left Analog (DPad is mapped to L-Analog)
 - RIGHT: Fake Right Analog (DPad is mapped to R-Analog)
 
@@ -35,47 +37,29 @@ DPAD mode is also persistent.
 
 ### Simulated home button
 
-Because the neogeo pad 2 doesn't have a home button, I also added some code so that holding start+select during more than 1 second presses the home button. You can customize the delay with #define HOME_DELAY 1000 in the .ino file.
+Because the PSX pad doesn't have a home button, I also added some code so that holding start+select during more than 1 second presses the home button. You can customize the delay with `#define HOME_DELAY 1000` in the .ino file.
 
 ## Building Instructions
 
 - Download Arduino IDE, 
-- Download the Bounce2 Library inside the Arduino IDE
 - Download Arduino Lufa from https://github.com/Palatis/Arduino-Lufa and follow the instructions to install and activate it
 - Build and Flash for your ATMEGA32U4 Board
 - Have Fun
 
 ## Pinout
 
-Here's the pinout
+When looking at the plug of the *controller cable* :
+```
+\12x|456|7xx/
 
-	joystickUP.attach(A0,INPUT_PULLUP);
-	
-	joystickDOWN.attach(A2,INPUT_PULLUP);
-	
-	joystickLEFT.attach(A1,INPUT_PULLUP);
-	
-	joystickRIGHT.attach(A3,INPUT_PULLUP);
-	
-	buttonA.attach(5,INPUT_PULLUP);
-	
-	buttonB.attach(4,INPUT_PULLUP);
-	
-	buttonX.attach(3,INPUT_PULLUP);
-	
-	buttonY.attach(15,INPUT_PULLUP);
-	
-	buttonLB.attach(14,INPUT_PULLUP);
-	
-	buttonRB.attach(2,INPUT_PULLUP);
-	
-	buttonLT.attach(6,INPUT_PULLUP);
-	
-	buttonRT.attach(7,INPUT_PULLUP);
-	
-	buttonSTART.attach(16,INPUT_PULLUP);
-	
-	buttonSELECT.attach(10,INPUT_PULLUP);
-	
-	buttonHOME.attach(9,INPUT_PULLUP);
-	
+1 : DAT        -> to arduino MISO (on ICSP header) (with 1k ohm pullup resistor*)
+2 : CMD        -> to arduino MOSI (on ICSP header)
+4 : GND        -> to arduino GND
+5 : 3.3V       -> to arduino 3.3V
+6 : Attention  -> to arduino digital pin 2
+7 : SCK        -> to arduino SCK (on ICSP header)
+
+* Note: 1k ohm pullup resistor to 5V means you also have to put a 1k ohm resistor between 5V and MISO. See the demo pic.
+
+ ```
+
