@@ -9,7 +9,6 @@
 #define HOME_DELAY 1000
 
 /* Buttons declarations */
-#define MILLIDEBOUNCE 1 //Debounce time in milliseconds
 unsigned long startAndSelTime = 0;
 unsigned long currTime = 0;
 
