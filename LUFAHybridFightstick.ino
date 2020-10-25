@@ -8,7 +8,8 @@
 #define HOME_DELAY 1000
 #define HOME_PRESS_TIME 200
 
-#define PANZER_PALADIN_HOTKEY
+// #define PANZER_PALADIN_HOTKEY
+#define SHANTAE_HOTKEY
 
 /** PINS **/
 int DATA_CLOCK    = 3;
@@ -197,6 +198,30 @@ void buttonRead()
   buttonStatus[BUTTONX] = buttons[9];
   buttonStatus[BUTTONLB] = buttons[10];
   buttonStatus[BUTTONRB] = buttons[11];
+
+#ifdef SHANTAE_HOTKEY
+  byte& modifier_button = buttonStatus[BUTTONSELECT];
+  static bool modifier_enabled = false;
+  if(modifier_button && (buttonStatus[BUTTONLB] || buttonStatus[BUTTONRB]))
+  {
+    modifier_enabled = true;
+    buttonStatus[BUTTONLT] = buttonStatus[BUTTONLB];
+    buttonStatus[BUTTONRT] = buttonStatus[BUTTONRB];
+    buttonStatus[BUTTONLB] = 0;
+    buttonStatus[BUTTONRB] = 0;
+  }
+  else
+  {
+    buttonStatus[BUTTONLT] = 0;
+    buttonStatus[BUTTONRT] = 0;
+  }
+
+  if(modifier_enabled)
+  {
+    modifier_enabled = (bool) modifier_button;
+    modifier_button = 0;
+  }
+#endif
 
 #ifdef PANZER_PALADIN_HOTKEY
   if((buttonStatus[BUTTONLB] && buttonStatus[BUTTONRB] && internalButtonStatus[BUTTONUP]) || 
