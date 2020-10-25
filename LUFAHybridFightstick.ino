@@ -7,9 +7,10 @@
 #define HOME_DELAY 1000
 
 /** PINS **/
-int DATA_CLOCK    = 6;
-int DATA_LATCH    = 3;
-int DATA_SERIAL   = 4;
+int DATA_CLOCK    = 3;
+int DATA_LATCH    = 2;
+int DATA_SERIAL   = 18;
+
 /** Data store for current state of buttons **/
 byte buttons[16];
 
