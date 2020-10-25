@@ -180,35 +180,39 @@ void convert_dpad(){
 }
 
 void buttonRead()
-{  
-RXTXControllerData();
+{
+  RXTXControllerData();
 
-buttonStatus[BUTTONB] = buttons[0];
-buttonStatus[BUTTONY] = buttons[1];
-buttonStatus[BUTTONSELECT] = buttons[2];
-buttonStatus[BUTTONSTART] = buttons[3];
-internalButtonStatus[BUTTONUP] = buttons[4];
-internalButtonStatus[BUTTONDOWN] = buttons[5];
-internalButtonStatus[BUTTONLEFT] = buttons[6];
-internalButtonStatus[BUTTONRIGHT] = buttons[7];
-buttonStatus[BUTTONA] = buttons[8];
-buttonStatus[BUTTONX] = buttons[9];
-buttonStatus[BUTTONLB] = buttons[10];
-buttonStatus[BUTTONRB] = buttons[11];
+  buttonStatus[BUTTONB] = buttons[0];
+  buttonStatus[BUTTONY] = buttons[1];
+  buttonStatus[BUTTONSELECT] = buttons[2];
+  buttonStatus[BUTTONSTART] = buttons[3];
+  internalButtonStatus[BUTTONUP] = buttons[4];
+  internalButtonStatus[BUTTONDOWN] = buttons[5];
+  internalButtonStatus[BUTTONLEFT] = buttons[6];
+  internalButtonStatus[BUTTONRIGHT] = buttons[7];
+  buttonStatus[BUTTONA] = buttons[8];
+  buttonStatus[BUTTONX] = buttons[9];
+  buttonStatus[BUTTONLB] = buttons[10];
+  buttonStatus[BUTTONRB] = buttons[11];
 
 #define HOME_HOTKEY
 #ifdef HOME_HOTKEY  
   if(buttonStatus[BUTTONSTART] && buttonStatus[BUTTONSELECT]) {
    if (startAndSelTime == 0)
-    startAndSelTime = millis();
+   {
+     startAndSelTime = millis();
+   }
    else if (currTime - startAndSelTime > HOME_DELAY)
    {
       buttonStatus[BUTTONHOME] = 1;
    }
- } else {
-  startAndSelTime = 0;
-  buttonStatus[BUTTONHOME] = 0;
- }
+  } // if(buttonStatus[BUTTONSTART] && buttonStatus[BUTTONSELECT]
+  else
+  {
+    startAndSelTime = 0;
+    buttonStatus[BUTTONHOME] = 0;
+  }
 #endif
-  
+
 }
