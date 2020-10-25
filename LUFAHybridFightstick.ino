@@ -199,7 +199,8 @@ void buttonRead()
   buttonStatus[BUTTONRB] = buttons[11];
 
 #ifdef PANZER_PALADIN_HOTKEY
-  if(buttonStatus[BUTTONLB] && (internalButtonStatus[BUTTONUP] || (buttonStatus[BUTTONLT] && buttonStatus[BUTTONRT])))
+  if((buttonStatus[BUTTONLB] && buttonStatus[BUTTONRB] && internalButtonStatus[BUTTONUP]) || 
+    (buttonStatus[BUTTONLT] && buttonStatus[BUTTONRT] && (buttonStatus[BUTTONLB] || buttonStatus[BUTTONRB] || internalButtonStatus[BUTTONUP])))
   {
     buttonStatus[BUTTONLB] = 0;
     buttonStatus[BUTTONRB] = 0;
