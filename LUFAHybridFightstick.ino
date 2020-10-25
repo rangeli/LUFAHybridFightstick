@@ -93,7 +93,7 @@ void setup() {
   EEPROM.get(0, state);
   EEPROM.get(2, xinput);
   setupPins();
-  delay(3000);
+  delay(5000);
   RXTXControllerData();
 // if select is held on boot, NSWitch mode
   if (buttons[2])
