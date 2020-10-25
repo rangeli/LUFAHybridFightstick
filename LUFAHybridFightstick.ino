@@ -4,8 +4,11 @@
 #include <EEPROM.h>
 #include <inttypes.h>
 //delay in ms for start+select to become HOME
+#define HOME_HOTKEY
 #define HOME_DELAY 1000
 #define HOME_PRESS_TIME 200
+
+#define PANZER_PALADIN_HOTKEY
 
 /** PINS **/
 int DATA_CLOCK    = 3;
@@ -195,8 +198,23 @@ void buttonRead()
   buttonStatus[BUTTONLB] = buttons[10];
   buttonStatus[BUTTONRB] = buttons[11];
 
-#define HOME_HOTKEY
-#ifdef HOME_HOTKEY  
+#ifdef PANZER_PALADIN_HOTKEY
+  if(buttonStatus[BUTTONLB] && (internalButtonStatus[BUTTONUP] || (buttonStatus[BUTTONLT] && buttonStatus[BUTTONRT])))
+  {
+    buttonStatus[BUTTONLB] = 0;
+    buttonStatus[BUTTONRB] = 0;
+    internalButtonStatus[BUTTONUP] = 0;
+    buttonStatus[BUTTONLT] = 1;
+    buttonStatus[BUTTONRT] = 1;
+  }
+  else
+  {
+    buttonStatus[BUTTONLT] = 0;
+    buttonStatus[BUTTONRT] = 0;
+  }
+#endif
+
+#ifdef HOME_HOTKEY
   if(buttonStatus[BUTTONSTART] && buttonStatus[BUTTONSELECT])
   {
     if(startAndSelTime == 0)
