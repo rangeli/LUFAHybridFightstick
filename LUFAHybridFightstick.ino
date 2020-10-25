@@ -5,6 +5,7 @@
 #include <inttypes.h>
 //delay in ms for start+select to become HOME
 #define HOME_DELAY 1000
+#define HOME_PRESS_TIME 200
 
 /** PINS **/
 int DATA_CLOCK    = 3;
@@ -198,15 +199,20 @@ void buttonRead()
 
 #define HOME_HOTKEY
 #ifdef HOME_HOTKEY  
-  if(buttonStatus[BUTTONSTART] && buttonStatus[BUTTONSELECT]) {
-   if (startAndSelTime == 0)
-   {
-     startAndSelTime = millis();
-   }
-   else if (currTime - startAndSelTime > HOME_DELAY)
-   {
+  if(buttonStatus[BUTTONSTART] && buttonStatus[BUTTONSELECT])
+  {
+    if(startAndSelTime == 0)
+    {
+      startAndSelTime = currTime;
+    }
+    else if((currTime - startAndSelTime) >= HOME_DELAY && (currTime - startAndSelTime) < (HOME_DELAY + HOME_PRESS_TIME))
+    {
       buttonStatus[BUTTONHOME] = 1;
-   }
+    }
+    else
+    {
+      buttonStatus[BUTTONHOME] = 0;
+    }
   } // if(buttonStatus[BUTTONSTART] && buttonStatus[BUTTONSELECT]
   else
   {
