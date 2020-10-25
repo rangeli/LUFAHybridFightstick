@@ -67,9 +67,7 @@ void setupPins(){
   digitalWrite (DATA_LATCH, LOW);
 
   /** Set DATA_SERIAL normally HIGH **/
-  pinMode (DATA_SERIAL, OUTPUT);
-  digitalWrite (DATA_SERIAL, HIGH);
-  pinMode (DATA_SERIAL, INPUT);  
+  pinMode (DATA_SERIAL, INPUT_PULLUP);  
 }
 
 void RXTXControllerData () {
